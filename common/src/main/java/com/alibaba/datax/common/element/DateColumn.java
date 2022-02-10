@@ -67,7 +67,10 @@ public class DateColumn extends Column {
 	 * */
 	public DateColumn(final java.sql.Timestamp ts) {
 		this(ts == null ? null : ts.getTime());
+		this.setRawNano(ts == null ? 0 : ts.getNanos());
 		this.setSubType(DateType.DATETIME);
+		LOG.warn("DateColumn(Timestamp) ts-> " + (null != ts ? ts.toString() : "NULL"));
+		LOG.warn("DateColumn(Timestamp) rawNano-> " + this.getRawNano());
 	}
 
 	@Override
