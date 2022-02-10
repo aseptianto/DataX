@@ -1,6 +1,7 @@
 package com.alibaba.datax.plugin.rdbms.writer;
 
 import com.alibaba.datax.common.element.Column;
+import com.alibaba.datax.common.element.DateColumn;
 import com.alibaba.datax.common.element.Record;
 import com.alibaba.datax.common.exception.DataXException;
 import com.alibaba.datax.common.plugin.RecordReceiver;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommonRdbmsWriter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CommonRdbmsWriter.class);
 
     public static class Job {
         private DataBaseType dataBaseType;
@@ -501,17 +504,15 @@ public class CommonRdbmsWriter {
 
                 case Types.TIMESTAMP:
                     java.sql.Timestamp sqlTimestamp = null;
+                    java.sql.Timestamp timestampNanosecond = null;
                     try {
-                        utilDate = column.asDate();
+                        timestampNanosecond = (java.sql.Timestamp)(column.asDate());
                     } catch (DataXException e) {
                         throw new SQLException(String.format(
                                 "TIMESTAMP 类型转换错误：[%s]", column));
                     }
-
-                    if (null != utilDate) {
-                        sqlTimestamp = new java.sql.Timestamp(
-                                utilDate.getTime());
-                    }
+                    sqlTimestamp = timestampNanosecond;
+                    LOG.warn("CommonRdbmsWriter fillPreparedStatementColumnType() sqlTimestamp -> " + sqlTimestamp.toString());
                     preparedStatement.setTimestamp(columnIndex + 1, sqlTimestamp);
                     break;
 

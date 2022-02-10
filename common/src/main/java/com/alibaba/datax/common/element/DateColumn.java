@@ -2,6 +2,8 @@ package com.alibaba.datax.common.element;
 
 import com.alibaba.datax.common.exception.CommonErrorCode;
 import com.alibaba.datax.common.exception.DataXException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -11,6 +13,10 @@ import java.util.Date;
  * Created by jingxing on 14-8-24.
  */
 public class DateColumn extends Column {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DateColumn.class);
+
+    private int rawNano;
 
 	private DateType subType = DateType.DATETIME;
 
@@ -87,8 +93,11 @@ public class DateColumn extends Column {
 			return null;
 		}
 
-		return new Date((Long)this.getRawData());
-	}
+		java.sql.Timestamp timestamp = new java.sql.Timestamp((Long) this.getRawData());
+		timestamp.setNanos(this.getRawNano());
+		LOG.warn("DateColumn.asDate() timestamp-> " + timestamp);
+		return timestamp;
+    }
 
 	@Override
 	public byte[] asBytes() {
@@ -124,7 +133,15 @@ public class DateColumn extends Column {
 		return subType;
 	}
 
-	public void setSubType(DateType subType) {
-		this.subType = subType;
-	}
+    public void setSubType(DateType subType) {
+        this.subType = subType;
+    }
+
+    public int getRawNano() {
+        return this.rawNano;
+    }
+
+    public void setRawNano(int rawNano) {
+        this.rawNano = rawNano;
+    }
 }
